@@ -12,6 +12,7 @@ import "./styles/app.css";
 const CatalogPage = lazy(() => import("./pages/CatalogPage.jsx"));
 const CreateProductPage = lazy(() => import("./pages/CreateProductPage.jsx"));
 const LoginPage = lazy(() => import("./pages/LoginPage.jsx"));
+const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage.jsx"));
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -35,6 +36,10 @@ createRoot(document.getElementById("root")).render(
                 <CreateProductPage />
               </ProtectedRoute>
             }
+          />
+          <Route
+            path="/productos/:id"
+            element={<ProductDetailPage />}
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

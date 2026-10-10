@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const imageOverrides = {
   "Sacred Wound": "Sacred Wound/Sacred Wound1.JPG",
   "Hushed Fae": "Hushed Fae/Hushed Fae1.JPG",
@@ -28,7 +30,11 @@ function ProductCard({ product }) {
       </div>
       <div className="product-card__content">
         <p className="product-card__category">{product.categoria}</p>
-        <h2>{product.nombre}</h2>
+        <h2>
+          <Link to={`/productos/${product._id}`}>
+            {product.nombre}
+          </Link>
+        </h2>
         <p className="product-card__description">{product.descripcion}</p>
         <p className="product-card__price">{product.precio} €</p>
       </div>
