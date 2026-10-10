@@ -1,19 +1,55 @@
+import { Link, useNavigate } from "react-router-dom";
+
 function SiteHeader({ activePage }) {
+  const navigate = useNavigate();
+  const isLoggedIn = Boolean(localStorage.getItem("token"));
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    navigate("/login");
+  }
+
   return (
     <header className="site-header">
-      <a className="site-logo" href="/index.html">Nana Nocturna</a>
+      <Link className="site-logo" to="/">
+        Nana Nocturna
+      </Link>
+
       <nav aria-label="Navegación principal">
-        <a href="/index.html" aria-current={activePage === "catalogo" ? "page" : undefined}>
-          Catálogo
-        </a>
-        <a
-          href="/crear.html"
-          target={activePage === "catalogo" ? "_blank" : undefined}
-          rel={activePage === "catalogo" ? "noreferrer" : undefined}
-          aria-current={activePage === "crear" ? "page" : undefined}
+        <Link
+          to="/"
+          aria-current={activePage === "catalogo" ? "page" : undefined}
         >
-          Crear pieza
-        </a>
+          Catálogo
+        </Link>
+
+        {isLoggedIn ? (
+          <>
+            <Link
+              to="/crear"
+              target={activePage === "catalogo" ? "_blank" : undefined}
+              rel={
+                activePage === "catalogo"
+                  ? "noopener noreferrer"
+                  : undefined
+              }
+              aria-current={activePage === "crear" ? "page" : undefined}
+            >
+              Crear pieza
+            </Link>
+
+            <button type="button" onClick={handleLogout}>
+              Cerrar sesión
+            </button>
+          </>
+        ) : (
+          <Link
+            to="/login"
+            aria-current={activePage === "login" ? "page" : undefined}
+          >
+            Iniciar sesión
+          </Link>
+        )}
       </nav>
     </header>
   );

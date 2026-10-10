@@ -24,13 +24,52 @@ async function request(path, options = {}) {
   return result.data;
 }
 
+function getAuthHeaders() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return {};
+  }
+
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+}
+
+export function loginUser(credentials) {
+  return request("/auth/login", {
+    method: "POST",
+    body: JSON.stringify(credentials),
+  });
+}
+
 export function getProducts() {
   return request("/products");
+}
+
+export function getProductById(id) {
+  return request(`/products/${id}`);
 }
 
 export function createProduct(product) {
   return request("/products", {
     method: "POST",
+    headers: getAuthHeaders(),
     body: JSON.stringify(product),
+  });
+}
+
+export function updateProduct(id, product) {
+  return request(`/products/${id}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(product),
+  });
+}
+
+export function deleteProduct(id) {
+  return request(`/products/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
   });
 }
