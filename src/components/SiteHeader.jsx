@@ -2,10 +2,13 @@ import { Link, useNavigate } from "react-router-dom";
 
 function SiteHeader({ activePage }) {
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+const isAdmin = user?.rol === "admin";
   const isLoggedIn = Boolean(localStorage.getItem("token"));
 
   function handleLogout() {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     navigate("/login");
   }
 
@@ -25,6 +28,7 @@ function SiteHeader({ activePage }) {
 
         {isLoggedIn ? (
           <>
+          {isAdmin && (
             <Link
               to="/crear"
               target={activePage === "catalogo" ? "_blank" : undefined}
@@ -37,7 +41,7 @@ function SiteHeader({ activePage }) {
             >
               Crear pieza
             </Link>
-
+          )}
             <button type="button" onClick={handleLogout}>
               Cerrar sesión
             </button>

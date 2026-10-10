@@ -26,6 +26,8 @@ function LoginPage() {
 
       localStorage.setItem("token", data.token);
 
+      localStorage.setItem("user", JSON.stringify(data.user));
+
       const destination = location.state?.from?.pathname || "/";
       navigate(destination, { replace: true });
     } catch (requestError) {
