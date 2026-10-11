@@ -8,8 +8,12 @@ import {
 } from "../services/api.js";
 
 const imageOverrides = {
-  "Sacred Wound": "Sacred Wound/Sacred Wound1.JPG",
-  "Hushed Fae": "Hushed Fae/Hushed Fae1.JPG",
+  "Sacred Wound": "Sacred Wound/Sacred Wound1.jpeg",
+  "Hushed Fae": "Hushed Fae/Hushed Fae1.jpeg",
+  "Wilted Fae": "Wilted Fae/Wilted Fae5.jpeg",
+  "Moonflower Reverie": "Moonflower Reverie/Moonflower Reverie1.jpeg",
+  "Moonlit Seraph": "Moonlit Seraph/Moonlit Seraph1.jpeg",
+  "Moonlit Revenant - prueba": "Moonlit Revenant/Moonlit Revenant1.jpeg",
   "Sacred Offering": "Sacred Offering/Sacred Offering.jpeg",
   Luneth: "Luneth.png",
   "Thorned Mourning": "Thorned Mourning/Thorned Mourning2.jpeg",
@@ -75,13 +79,14 @@ async function handleUpdate(event) {
   setActionError("");
 
   try {
-    const mainImage = product.imagen?.includes("/")
+    const mainImage = (product.imagen?.includes("/")
       ? product.imagen
-      : imageOverrides[product.nombre] || `${product.nombre}/${product.imagen}`;
+      : imageOverrides[product.nombre] || `${product.nombre}/${product.imagen}`)
+      .replace(/\.JPG$/, ".jpeg");
 
     const galleryImages = Array.isArray(product.imagenesGaleria)
       ? product.imagenesGaleria.map((image) =>
-          image.includes("/") ? image : `${product.nombre}/${image}`
+          (image.includes("/") ? image : `${product.nombre}/${image}`).replace(/\.JPG$/, ".jpeg")
         )
       : [];
 
@@ -157,9 +162,10 @@ async function handleDelete() {
     ? product.materiales.join(", ")
     : "—";
 
-  const primaryImage = product.imagen?.includes("/")
+  const primaryImage = (product.imagen?.includes("/")
     ? product.imagen
-    : imageOverrides[product.nombre] || `${product.nombre}/${product.imagen}`;
+    : imageOverrides[product.nombre] || `${product.nombre}/${product.imagen}`)
+    .replace(/\.JPG$/, ".jpeg");
   const imageUrl = `/assets/img/${primaryImage
     .split("/")
     .map(encodeURIComponent)
@@ -189,9 +195,10 @@ async function handleDelete() {
             {galleryImages.length > 0 && (
               <div className="product-detail__gallery" aria-label="Galería de imágenes">
                 {galleryImages.map((image, index) => {
-                  const galleryPath = image.includes("/")
+                  const galleryPath = (image.includes("/")
                     ? image
-                    : `${product.nombre}/${image}`;
+                    : `${product.nombre}/${image}`)
+                    .replace(/\.JPG$/, ".jpeg");
                   const galleryUrl = `/assets/img/${galleryPath}`
                     .split("/")
                     .map(encodeURIComponent)

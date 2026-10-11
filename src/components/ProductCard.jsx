@@ -1,17 +1,22 @@
 import { Link } from "react-router-dom";
 
 const imageOverrides = {
-  "Sacred Wound": "Sacred Wound/Sacred Wound1.JPG",
-  "Hushed Fae": "Hushed Fae/Hushed Fae1.JPG",
+  "Sacred Wound": "Sacred Wound/Sacred Wound1.jpeg",
+  "Hushed Fae": "Hushed Fae/Hushed Fae1.jpeg",
+  "Wilted Fae": "Wilted Fae/Wilted Fae5.jpeg",
+  "Moonflower Reverie": "Moonflower Reverie/Moonflower Reverie1.jpeg",
+  "Moonlit Seraph": "Moonlit Seraph/Moonlit Seraph1.jpeg",
+  "Moonlit Revenant - prueba": "Moonlit Revenant/Moonlit Revenant1.jpeg",
   "Sacred Offering": "Sacred Offering/Sacred Offering.jpeg",
   Luneth: "Luneth.png",
   "Thorned Mourning": "Thorned Mourning/Thorned Mourning2.jpeg",
 };
 
 function ProductCard({ product }) {
-  const imagePath = product.imagen?.includes("/")
+  const imagePath = (product.imagen?.includes("/")
     ? product.imagen
-    : imageOverrides[product.nombre] || `${product.nombre}/${product.imagen}`;
+    : imageOverrides[product.nombre] || `${product.nombre}/${product.imagen}`)
+    .replace(/\.JPG$/, ".jpeg");
   const imageUrl = `/assets/img/${imagePath.split("/").map(encodeURIComponent).join("/")}`;
   const status = product.estado || (product.disponible ? "disponible" : "no disponible");
 
