@@ -1,6 +1,6 @@
 # Nana Nocturna — frontend PEC 4
 
-Interfaz React de Nana Nocturna con dos páginas: catálogo y creación de piezas. Obtiene los datos reales de MongoDB a través de la API de la PEC 3.
+Interfaz React de Nana Nocturna con distintas páginas: catálogo, ficha de producto, inicio de sesion y creación de piezas. Obtiene los datos reales de MongoDB a través de la API de la PEC 3.
 
 ## Tecnologías
 
@@ -62,8 +62,6 @@ npm.cmd run dev
 
 ## Variables de entorno
 
-`VITE_API_URL` es la URL base de la API y debe terminar en `/api`.
-
 ```env
 VITE_API_URL=https://nana-nocturna-api.vercel.app/api
 ```
@@ -72,10 +70,10 @@ En local se configura en `frontend/.env.local`. En Vercel, añade la misma varia
 
 ## Endpoints utilizados
 
-| Método | Endpoint | Uso |
-| --- | --- | --- |
-| GET | `/api/products` | Listar piezas desde MongoDB |
-| POST | `/api/products` | Crear una pieza en MongoDB |
+| Método |    Endpoint     |             Uso             |
+|   ---  |       ---       |             ---             |
+|   GET  | `/api/products` | Listar piezas desde MongoDB |
+|  POST  | `/api/products` | Crear una pieza en MongoDB  |
 
 El modelo que usa la API para esas rutas es `Pieza`, asociado a la colección Atlas `piezas`. El backend también define el modelo `Usuarios`.
 

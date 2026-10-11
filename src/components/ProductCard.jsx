@@ -9,7 +9,9 @@ const imageOverrides = {
 };
 
 function ProductCard({ product }) {
-  const imagePath = imageOverrides[product.nombre] || `${product.nombre}/${product.imagen}`;
+  const imagePath = product.imagen?.includes("/")
+    ? product.imagen
+    : imageOverrides[product.nombre] || `${product.nombre}/${product.imagen}`;
   const imageUrl = `/assets/img/${imagePath.split("/").map(encodeURIComponent).join("/")}`;
   const status = product.estado || (product.disponible ? "disponible" : "no disponible");
 

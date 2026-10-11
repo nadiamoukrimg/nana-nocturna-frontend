@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import SiteHeader from "../components/SiteHeader.jsx";
-import { getProductById } from "../services/api.js";
+import {
+  deleteProduct,
+  getProductById,
+  updateProduct,
+} from "../services/api.js";
 
 const imageOverrides = {
   "Sacred Wound": "Sacred Wound/Sacred Wound1.JPG",
@@ -13,9 +17,23 @@ const imageOverrides = {
 
 function ProductDetailPage() {
   const { id } = useParams();
+
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+
+    const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const isAdmin = user?.rol === "admin";
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [actionError, setActionError] = useState("");
+  const [editForm, setEditForm] = useState({
+    nombre: "",
+    descripcion: "",
+    precio: "",
+  });
 
   useEffect(() => {
     let isMounted = true;
@@ -36,6 +54,93 @@ function ProductDetailPage() {
     };
   }, [id]);
 
+  function startEditing() {
+  setEditForm({
+    nombre: product.nombre || "",
+    descripcion: product.descripcion || "",
+    precio: product.precio ?? "",
+  });
+  setActionError("");
+  setIsEditing(true);
+}
+
+function handleEditChange(event) {
+  const { name, value } = event.target;
+  setEditForm((current) => ({ ...current, [name]: value }));
+}
+
+async function handleUpdate(event) {
+  event.preventDefault();
+  setIsSaving(true);
+  setActionError("");
+
+  try {
+    const mainImage = product.imagen?.includes("/")
+      ? product.imagen
+      : imageOverrides[product.nombre] || `${product.nombre}/${product.imagen}`;
+
+    const galleryImages = Array.isArray(product.imagenesGaleria)
+      ? product.imagenesGaleria.map((image) =>
+          image.includes("/") ? image : `${product.nombre}/${image}`
+        )
+      : [];
+
+    const updatedProduct = await updateProduct(id, {
+      nombre: editForm.nombre.trim(),
+      descripcion: editForm.descripcion.trim(),
+      precio: Number(editForm.precio),
+      imagen: mainImage,
+      imagenesGaleria: galleryImages,
+    });
+
+    setProduct(updatedProduct);
+    setIsEditing(false);
+  } catch (error) {
+    setActionError(error.message);
+  } finally {
+    setIsSaving(false);
+  }
+}
+
+async function handleAvailabilityChange() {
+  const disponible = !product.disponible;
+  setIsSaving(true);
+  setActionError("");
+
+  try {
+    const updatedProduct = await updateProduct(id, {
+      disponible,
+      estado: disponible ? "disponible" : "vendida",
+    });
+
+    setProduct(updatedProduct);
+  } catch (error) {
+    setActionError(error.message);
+  } finally {
+    setIsSaving(false);
+  }
+}
+
+async function handleDelete() {
+  const confirmed = window.confirm(
+    `¿Seguro que quieres eliminar "${product.nombre}"?`
+  );
+
+  if (!confirmed) return;
+
+  setIsSaving(true);
+  setActionError("");
+
+  try {
+    await deleteProduct(id);
+    navigate("/");
+  } catch (error) {
+    setActionError(error.message);
+  } finally {
+    setIsSaving(false);
+  }
+}
+
   if (isLoading) {
     return <p className="notice">Cargando pieza…</p>;
   }
@@ -52,8 +157,9 @@ function ProductDetailPage() {
     ? product.materiales.join(", ")
     : "—";
 
-  const primaryImage = imageOverrides[product.nombre]
-    || `${product.nombre}/${product.imagen}`;
+  const primaryImage = product.imagen?.includes("/")
+    ? product.imagen
+    : imageOverrides[product.nombre] || `${product.nombre}/${product.imagen}`;
   const imageUrl = `/assets/img/${primaryImage
     .split("/")
     .map(encodeURIComponent)
@@ -83,7 +189,10 @@ function ProductDetailPage() {
             {galleryImages.length > 0 && (
               <div className="product-detail__gallery" aria-label="Galería de imágenes">
                 {galleryImages.map((image, index) => {
-                  const galleryUrl = `/assets/img/${product.nombre}/${image}`
+                  const galleryPath = image.includes("/")
+                    ? image
+                    : `${product.nombre}/${image}`;
+                  const galleryUrl = `/assets/img/${galleryPath}`
                     .split("/")
                     .map(encodeURIComponent)
                     .join("/");
@@ -126,6 +235,97 @@ function ProductDetailPage() {
                 {product.disponible ? "Disponible en la colección" : "Esta pieza ya ha sido vendida"}
               </p>
             </div>
+              {actionError && (
+                <p className="notice notice--error" role="alert">
+                  {actionError}
+                </p>
+              )}
+
+              {isAdmin && (
+                <section className="product-detail__admin" aria-label="Gestión de la pieza">
+                  {isEditing ? (
+                    <form className="product-form" onSubmit={handleUpdate}>
+                      <label>
+                        Nombre
+                        <input
+                          name="nombre"
+                          value={editForm.nombre}
+                          onChange={handleEditChange}
+                          required
+                        />
+                      </label>
+
+                      <label>
+                        Descripción
+                        <textarea
+                          name="descripcion"
+                          value={editForm.descripcion}
+                          onChange={handleEditChange}
+                          rows="3"
+                          required
+                        />
+                      </label>
+
+                      <label>
+                        Precio (€)
+                        <input
+                          name="precio"
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={editForm.precio}
+                          onChange={handleEditChange}
+                          required
+                        />
+                      </label>
+
+                      <div className="product-detail__admin-buttons">
+                        <button className="submit-button" type="submit" disabled={isSaving}>
+                          {isSaving ? "Guardando…" : "Guardar cambios"}
+                        </button>
+
+                        <button
+                          className="admin-button"
+                          type="button"
+                          onClick={() => setIsEditing(false)}
+                          disabled={isSaving}
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <div className="product-detail__admin-buttons">
+                      <button
+                        className="admin-button"
+                        type="button"
+                        onClick={startEditing}
+                        disabled={isSaving}
+                      >
+                        Editar pieza
+                      </button>
+
+                      <button
+                        className="admin-button"
+                        type="button"
+                        onClick={handleAvailabilityChange}
+                        disabled={isSaving}
+                      >
+                        {product.disponible ? "Marcar como vendida" : "Marcar como disponible"}
+                      </button>
+
+                      <button
+                        className="admin-button admin-button--delete"
+                        type="button"
+                        onClick={handleDelete}
+                        disabled={isSaving}
+                      >
+                        Eliminar pieza
+                      </button>
+                    </div>
+                  )}
+                </section>
+              )} 
           </div>
         </section>
       </main>
