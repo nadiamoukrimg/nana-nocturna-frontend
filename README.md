@@ -46,14 +46,14 @@ En la ficha, el administrador puede editar los datos, cambiar la disponibilidad 
 
 Las llamadas HTTP están centralizadas en `src/services/api.js`. El frontend utiliza estas rutas:
 
-| Método | Ruta | Uso |
-|---|---|---|
-| GET | `/api/products` | Cargar el catálogo. |
-| GET | `/api/products/:id` | Cargar una ficha. |
-| POST | `/api/auth/login` | Iniciar sesión. |
-| POST | `/api/products` | Crear una pieza. |
-| PUT | `/api/products/:id` | Editar una pieza o cambiar su disponibilidad. |
-| DELETE | `/api/products/:id` | Eliminar una pieza. |
+|   Método  |          Ruta        |            Uso           |
+|    ---    |          ---         |            ---           |
+|    GET    |    `/api/products`   |    Cargar el catálogo.   |
+|    GET    | `/api/products/:id`  |     Cargar una ficha.    |
+|    POST   | `/api/auth/login`    |       Iniciar sesión.    |
+|    POST   |    `/api/products`   |       Crear una pieza.   |
+|    PUT    | `/api/products/:id`  | Editar una pieza o cambiar su disponibilidad. |
+|   DELETE  | `/api/products/:id`  |     Eliminar una pieza.  |
 
 Para crear, editar o eliminar, la aplicación envía el token de inicio de sesión. Los datos de las piezas se guardan en MongoDB a través del backend; no se simulan con una lista local.
 
@@ -94,13 +94,20 @@ Las imágenes del proyecto están en `public/assets/img`. Para que se muestre un
 
 ## Despliegue en Vercel
 
-El frontend se despliega como un proyecto Vercel independiente conectado al repositorio `nana-nocturna-frontend`. Al importarlo, selecciona Vite y añade la variable `VITE_API_URL` con:
+El frontend ya está desplegado en Vercel y conectado al repositorio `nana-nocturna-frontend`.
 
-```text
-https://nana-nocturna-api.vercel.app/api
+- Web: [https://nana-nocturna-frontend.vercel.app/](https://nana-nocturna-frontend.vercel.app/)
+- API: [https://nana-nocturna-api.vercel.app/](https://nana-nocturna-api.vercel.app/)
+
+El proyecto utiliza Vite, el comando de compilación `npm run build` y la carpeta de salida `dist`. En las variables de entorno de Vercel está configurada la URL de la API:
+
+```env
+VITE_API_URL=https://nana-nocturna-api.vercel.app/api
 ```
 
-Después de cambiar esa variable en Vercel hay que crear un nuevo despliegue. Cuando esté publicado, aquí se puede añadir la URL que asigne Vercel al frontend.
+El archivo `vercel.json` redirige las rutas a `index.html` para que React Router pueda mostrar las páginas al abrir una dirección directamente o recargar una ficha.
+
+Los cambios enviados a la rama conectada de GitHub generan un nuevo despliegue. Si se cambia una variable de entorno en Vercel, hay que volver a desplegar para aplicarla.
 
 ## Flujo de la aplicación
 
