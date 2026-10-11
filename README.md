@@ -1,101 +1,118 @@
-# Nana Nocturna — frontend PEC 4
+# Nana Nocturna — frontend
 
-Interfaz React de Nana Nocturna con distintas páginas: catálogo, ficha de producto, inicio de sesion y creación de piezas. Obtiene los datos reales de MongoDB a través de la API de la PEC 3.
+Este es el frontend de mi proyecto Nana Nocturna. Está hecho con React y Vite. El catálogo y las fichas muestran datos que obtiene de la API, y la aplicación permite iniciar sesión y gestionar piezas con una cuenta de administrador.
+
+- Repositorio: [nana-nocturna-frontend](https://github.com/nadiamoukrimg/nana-nocturna-frontend)
+- Repositorio del backend: [nana-nocturna-api](https://github.com/nadiamoukrimg/nana-nocturna-api)
+- API utilizada: [https://nana-nocturna-api.vercel.app](https://nana-nocturna-api.vercel.app)
 
 ## Tecnologías
 
-- React y Vite.
-- API Express de la PEC 3.
-- Datos guardados en MongoDB Atlas por el backend.
+- React
+- Vite
+- React Router
+- JavaScript y CSS
+- API REST creada con Express
+- MongoDB Atlas, a través del backend
 
-## Estructura
+## Organización
 
 ```text
 frontend/
-├── public/assets/img/       # Imágenes del catálogo
-├── crear.html               # Página independiente del formulario
+├── public/assets/img/       # Imágenes de las piezas
+├── crear.html               # Entrada de la página de creación
 ├── src/
-│   ├── components/          # Tarjeta y formulario de pieza
-│   ├── pages/               # Página del catálogo y página de creación
-│   ├── services/            # Llamadas HTTP a la API
-│   └── styles/              # Estilos de la aplicación
+│   ├── components/          # Componentes reutilizables
+│   ├── pages/               # Catálogo, ficha, login y creación
+│   ├── services/api.js      # Peticiones a la API
+│   ├── styles/              # Estilos
+│   ├── create.jsx
+│   └── main.jsx             # Rutas de la aplicación
 ├── .env.example
 ├── index.html
 └── package.json
 ```
 
-## Requisitos previos
+## Páginas
 
-- Node.js y npm instalados.
-- La API de PEC 3 desplegada y conectada a MongoDB Atlas.
+- `/`: catálogo de piezas.
+- `/productos/:id`: ficha de una pieza.
+- `/login`: inicio de sesión.
+- `/crear` y `/crear.html`: formulario para crear piezas. Solo puede entrar una cuenta de administrador.
 
-Repositorio backend: [nana-nocturna-api](https://github.com/nadiamoukrimg/nana-nocturna-api). La aplicación frontend usa la versión desplegada de esa API por defecto.
+En la ficha, el administrador puede editar los datos, cambiar la disponibilidad o eliminar la pieza. Las cuentas de cliente pueden consultar el catálogo, pero no gestionar piezas.
 
-## Instalación y ejecución
+## Conexión con la API
 
-Desde PowerShell, sitúate en la carpeta principal `NanaNocturna` y ejecuta:
+Las llamadas HTTP están centralizadas en `src/services/api.js`. El frontend utiliza estas rutas:
+
+| Método | Ruta | Uso |
+|---|---|---|
+| GET | `/api/products` | Cargar el catálogo. |
+| GET | `/api/products/:id` | Cargar una ficha. |
+| POST | `/api/auth/login` | Iniciar sesión. |
+| POST | `/api/products` | Crear una pieza. |
+| PUT | `/api/products/:id` | Editar una pieza o cambiar su disponibilidad. |
+| DELETE | `/api/products/:id` | Eliminar una pieza. |
+
+Para crear, editar o eliminar, la aplicación envía el token de inicio de sesión. Los datos de las piezas se guardan en MongoDB a través del backend; no se simulan con una lista local.
+
+## Instalar y ejecutar en local
+
+Necesitas tener Node.js instalado. Abre una terminal en la carpeta `frontend` y ejecuta:
 
 ```powershell
-cd frontend
 npm.cmd install
 Copy-Item .env.example .env.local
 npm.cmd run dev
 ```
 
-La aplicación se abrirá en la dirección local que indique Vite (normalmente `http://localhost:5173`). Para conectarla a la API ejecutada localmente, cambia temporalmente `VITE_API_URL` en `.env.local` a `http://localhost:3000/api`.
+Vite indicará la dirección local de la aplicación, normalmente `http://localhost:5173`.
 
-El catálogo está en `http://localhost:5173/` y el formulario independiente en `http://localhost:5173/crear.html`. El enlace «Crear pieza» del catálogo abre el formulario en otra pestaña.
-
-Abre otra terminal en la carpeta principal `NanaNocturna` para iniciar el backend:
+Para generar una versión de producción y verla localmente:
 
 ```powershell
-cd backend
-npm.cmd install
-Copy-Item .env.example .env
+npm.cmd run build
+npm.cmd run preview
 ```
 
-Completa `MONGODB_URI` en `backend/.env` con la cadena de conexión privada de Atlas y arranca el servidor:
+El frontend necesita que la API esté disponible. Para utilizar la API local, cambia temporalmente `VITE_API_URL` en `.env.local` a `http://localhost:3000/api` y arranca también el backend. Para usar la API desplegada, utiliza el valor de ejemplo.
 
-```powershell
-npm.cmd run dev
-```
+## Variable de entorno
 
-## Variables de entorno
+En `.env.local` se configura la dirección base de la API:
 
 ```env
 VITE_API_URL=https://nana-nocturna-api.vercel.app/api
 ```
 
-En local se configura en `frontend/.env.local`. En Vercel, añade la misma variable para los entornos que se vayan a desplegar. No incluyas credenciales de Atlas en el frontend: la conexión a Atlas solo está en el backend.
+El archivo `.env.example` contiene el nombre y el valor de ejemplo para configurar el proyecto. En Vercel también hay que crear `VITE_API_URL` en las variables de entorno del frontend. Esta URL no es una contraseña. La URI de MongoDB y el secreto de los tokens pertenecen únicamente al backend.
 
-## Endpoints utilizados
+## Imágenes
 
-| Método |    Endpoint     |             Uso             |
-|   ---  |       ---       |             ---             |
-|   GET  | `/api/products` | Listar piezas desde MongoDB |
-|  POST  | `/api/products` | Crear una pieza en MongoDB  |
+Las imágenes del proyecto están en `public/assets/img`. Para que se muestre una imagen nueva, su archivo debe estar en esa carpeta y el nombre o ruta guardado en la pieza debe coincidir con el archivo.
 
-El modelo que usa la API para esas rutas es `Pieza`, asociado a la colección Atlas `piezas`. El backend también define el modelo `Usuarios`.
+## Despliegue en Vercel
 
-El formulario guarda nombres de imágenes como texto, tal como espera el modelo de la API. Para mostrar una foto propia de una pieza nueva, su archivo debe existir en `public/assets/img/<nombre de la pieza>/<nombre de imagen>`; si no está, la tarjeta muestra la imagen alternativa del proyecto.
+El frontend se despliega como un proyecto Vercel independiente conectado al repositorio `nana-nocturna-frontend`. Al importarlo, selecciona Vite y añade la variable `VITE_API_URL` con:
+
+```text
+https://nana-nocturna-api.vercel.app/api
+```
+
+Después de cambiar esa variable en Vercel hay que crear un nuevo despliegue. Cuando esté publicado, aquí se puede añadir la URL que asigne Vercel al frontend.
 
 ## Flujo de la aplicación
 
 ```mermaid
 flowchart LR
-  U[Persona usuaria] --> C[CatalogPage]
-  U --> F[CreateProductPage]
-  C -->|GET| S[services/api.js]
-  F -->|POST| S
-  S -->|/api/products| A[API Express en Vercel]
-  A --> D[(MongoDB Atlas: piezas)]
-  D --> A
-  A -->|JSON| S
-  S -->|lista de piezas| C
-  S -->|resultado de creación| F
-  C --> T[Tarjetas del catálogo]
+    Persona --> React
+    React --> Paginas
+    Paginas --> Servicio["services/api.js"]
+    Servicio -->|GET, POST, PUT, DELETE| API["API Express"]
+    Servicio -->|login| API
+    API --> Atlas[(MongoDB Atlas)]
+    Atlas --> API
+    API --> Servicio
+    Servicio --> React
 ```
-
-## Despliegue del frontend en Vercel
-
-Importa el repositorio frontend en Vercel y selecciona Vite. Si el repositorio contiene únicamente el contenido de esta carpeta, usa `./` como directorio raíz; si contiene el proyecto completo, usa `frontend`. Añade `VITE_API_URL` con el valor mostrado arriba y despliega. Tras cambiar una variable de entorno, vuelve a desplegar.
